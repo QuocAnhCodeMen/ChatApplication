@@ -1,0 +1,43 @@
+﻿@page "/"
+@implements IAsyncDisposable
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+@if (SystemMessageFromHubServer is not null)
+{
+    @SystemMessageFromHubServer
+}
+
+Welcome to your new app.
+
+@code{
+    private HubConnection? _hubConnection;
+    private string? SystemMessageFromHubServer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+                        .WithUrl("https://localhost:7096/chathub")
+                        .Build();
+        _hubConnection.On<string>("SystemMessage", HandleSystemMessage);
+        await _hubConnection.StartAsync();
+        await base.OnInitializedAsync();
+    }
+
+    private void HandleSystemMessage(string obj)
+    {
+        SystemMessageFromHubServer = obj;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if(_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
+
+}
