@@ -8,8 +8,9 @@
 {
     @SystemMessageFromHubServer
 }
+<UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
 
-Welcome to your new app.
+
 
 @code{
     private HubConnection? _hubConnection;
@@ -17,12 +18,22 @@ Welcome to your new app.
 
     protected override async Task OnInitializedAsync()
     {
+        // await ConnectionToHubServer();
+    }
+
+    private async Task ConnectionToHubServer(string userName)
+    {
         _hubConnection = new HubConnectionBuilder()
-                        .WithUrl("https://localhost:7096/chathub")
-                        .Build();
+                .WithUrl($"https://localhost:7096/chathub?username={userName}")
+                .Build();
         _hubConnection.On<string>("SystemMessage", HandleSystemMessage);
         await _hubConnection.StartAsync();
         await base.OnInitializedAsync();
+
+    }
+    private async Task ProvideUserInfoToHubServer(string userName)
+    {
+        await ConnectionToHubServer(userName);
     }
 
     private void HandleSystemMessage(string obj)

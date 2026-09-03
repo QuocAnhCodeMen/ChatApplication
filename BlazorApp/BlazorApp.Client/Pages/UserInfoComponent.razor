@@ -1,0 +1,30 @@
+﻿
+
+<EditForm Model="userInfo" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label" style="font-weight:bold">UserName</label>
+        <input type="text" class="form-control" @bind-value="userInfo.UserName">
+        <ValidationMessage For="(()=>userInfo.UserName)" />
+        
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+
+
+@code {
+
+    public UserInfo userInfo = new();
+
+    [Parameter]
+    public EventCallback<string> eventCallback { set; get; }
+
+
+
+    private void Submit()
+    {
+        eventCallback.InvokeAsync(userInfo.UserName);
+    }
+}

@@ -9,11 +9,15 @@ public class ChatHub:Hub
     {
         _logger = logger;
     }
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         _logger.LogInformation("Client nao do da ket noi den HubServer");
-        Clients.Caller
+        await Clients.Caller
             .SendAsync("SystemMessage", $"Hello {Context.ConnectionId} Cám ơn vì daden");
-        return base.OnConnectedAsync();
+
+        var userName = string.Empty;
+        userName = Context.GetHttpContext()?.Request.Query["username"];
+        _logger.LogInformation("UserName: " + userName);
+        await base.OnConnectedAsync();
     }
 }
