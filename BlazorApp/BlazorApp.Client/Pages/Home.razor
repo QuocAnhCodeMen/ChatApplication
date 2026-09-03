@@ -4,20 +4,40 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-@if (SystemMessageFromHubServer is not null)
-{
-    @SystemMessageFromHubServer
-}
-<UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
 
-<GroupChatComponent _connectedUsers="_connectedUsers" />
+@if (SystemMessageFromHubServer is null)
+{
+    <UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
+}
+else
+{
+    <h1>@SystemMessageFromHubServer</h1>
+    
+    <div class="row">
+        <div class="col-4">
+            <GroupChatComponent _connectedUsers="_connectedUsers"
+                              UserId="@UserId"
+                              eventCallback="SelectUser"/>
+        </div>
+        <div class="col-8">
+            <ChatComponent fromUserId="@UserId"
+                           ToUser="@TargetUser"
+                           connectedUsers="_connectedUsers"/>
+        </div>
+    </div>
+    
+    
+}
+
+
+
 
 @code{
     private HubConnection? _hubConnection;
     private string? SystemMessageFromHubServer;
     private List<ConnectedUser>? _connectedUsers;
-
+    private string? UserId = string.Empty;
+    private ConnectedUser? TargetUser{ set; get; }
     protected override async Task OnInitializedAsync()
     {
         // await ConnectionToHubServer();
@@ -28,7 +48,7 @@
         _hubConnection = new HubConnectionBuilder()
                 .WithUrl($"https://localhost:7096/chathub?username={userName}"+$"&userid={userId}")
                 .Build();
-        _hubConnection.On<string>("SystemMessage", HandleSystemMessage);
+        _hubConnection.On<string,string>("SystemMessage", HandleSystemMessage);
         _hubConnection.On<List<ConnectedUser>>("UpdateListConnectedUsers", HandleUpdateList);
         await _hubConnection.StartAsync();
         await base.OnInitializedAsync();
@@ -47,9 +67,10 @@
         await ConnectionToHubServer(userName,userId);
     }
 
-    private void HandleSystemMessage(string obj)
+    private void HandleSystemMessage(string obj, string userId)
     {
         SystemMessageFromHubServer = obj;
+        UserId = userId;
         InvokeAsync(StateHasChanged);
     }
 
@@ -61,5 +82,9 @@
         }
     }
 
-
+    private void SelectUser(ConnectedUser user)
+    {
+        TargetUser = user;
+        // Console.WriteLine(TargetUser.UserName);
+    }
 }

@@ -1,0 +1,77 @@
+﻿
+@if(fromUserId is not null && 
+ToUser is not null && 
+connectedUsers is not null && 
+connectedUsers.Count > 0)
+{
+
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            
+            @if(Messages is not null)
+            {
+                @foreach (var message in Messages)
+                {
+                    <li class="list-group-item">
+
+                        <h5 class="card-title">QA Coder</h5>
+                        <p class="card-text"><i>@message.Message</i></p>
+                    </li>
+                }
+            }
+        
+            
+            <li class="list-group-item">
+
+                <h5 class="card-title">QA Coder</h5>
+                <p class="card-text"><i>Messsge gi do</i></p>
+            </li>
+            <li class="list-group-item">A third item</li>
+        </ul>
+        <div class="card-footer d-flex align-items-start">
+            <input @bind="newMessage" type="text" placeholder="Write your Message here....." />
+            <button @onclick="Send" class="btn btn-primary" style="margin:5px">Send</button>
+        </div>
+    </div>
+}
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public string? fromUserId { set; get; }
+
+    [Parameter]
+    public ConnectedUser? ToUser { set; get; }
+    [Parameter]
+    public List<ConnectedUser>? connectedUsers { set; get; }
+
+    private List<ChatMessage>? Messages { set; get; }
+    private string? newMessage;
+    protected override void OnParametersSet()
+    {
+        if(ToUser is not null)
+        {
+            Messages = ToUser.Messages.Where(m => m.FromUserId == fromUserId).ToList();
+        }
+
+    }
+
+
+    private void Send()
+    {
+        var chatMessage = new ChatMessage()
+            {
+                FromUserId = fromUserId,
+                ToUserId = ToUser?.UserId,
+                Message = newMessage
+
+            };
+        ToUser?.Messages.Add(chatMessage);
+        
+
+    }
+}

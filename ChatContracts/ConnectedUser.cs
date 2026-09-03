@@ -6,5 +6,7 @@ public class ConnectedUser
     public string? UserId { set; get; } = string.Empty;
     public string? ConnectedId { set; get; } = string.Empty;
 
+    public List<ChatMessage> Messages = new();
+
 
 }

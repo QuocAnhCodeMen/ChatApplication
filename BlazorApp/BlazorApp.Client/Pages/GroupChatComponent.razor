@@ -5,16 +5,35 @@
 }
 else
 {
-    <ul>
+    <ul class="list-group">
         @foreach (var user in _connectedUsers)
         {
-            <li>@user.UserName</li>
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                if (user.UserId != UserId)
+                {
+                    <li @onclick="()=>SelectUser(user)" class="list-group-item">@user.UserName</li>
+                }
+            }
+
+            
         }
+       
     </ul>
+
 }
 
 
 @code {
     [Parameter]
     public List<ConnectedUser>? _connectedUsers { set; get; }
+    [Parameter]
+    public string? UserId { set; get; }
+    [Parameter]
+    public EventCallback<ConnectedUser> eventCallback { set; get; }
+
+    private void SelectUser(ConnectedUser user)
+    {
+        eventCallback.InvokeAsync(user);
+    }
 }

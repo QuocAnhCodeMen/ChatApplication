@@ -24,7 +24,7 @@ public class ChatHub:Hub
         userId = Context.GetHttpContext()?.Request.Query["userid"];
         var connectedUser = new ConnectedUser()
         {
-            UserId = "",
+            UserId = userId,
             UserName = userName,
             ConnectedId = Context.ConnectionId
         };
@@ -34,7 +34,7 @@ public class ChatHub:Hub
         }
        
         await Clients.Caller
-           .SendAsync("SystemMessage", $"Hello {userName} Cám ơn vì daden");
+           .SendAsync("SystemMessage", $"Hello {userName} Cám ơn vì daden",userId);
         await Clients.All
             .SendAsync("UpdateListConnectedUsers", _connectedUsers);
         await base.OnConnectedAsync();
