@@ -1,4 +1,5 @@
 ﻿@page "/"
+
 @implements IAsyncDisposable
 
 <PageTitle>Home</PageTitle>
@@ -10,30 +11,40 @@
 }
 <UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
 
-
+<GroupChatComponent _connectedUsers="_connectedUsers" />
 
 @code{
     private HubConnection? _hubConnection;
     private string? SystemMessageFromHubServer;
+    private List<ConnectedUser>? _connectedUsers;
 
     protected override async Task OnInitializedAsync()
     {
         // await ConnectionToHubServer();
     }
 
-    private async Task ConnectionToHubServer(string userName)
+    private async Task ConnectionToHubServer(string userName, string userId)
     {
         _hubConnection = new HubConnectionBuilder()
-                .WithUrl($"https://localhost:7096/chathub?username={userName}")
+                .WithUrl($"https://localhost:7096/chathub?username={userName}"+$"&userid={userId}")
                 .Build();
         _hubConnection.On<string>("SystemMessage", HandleSystemMessage);
+        _hubConnection.On<List<ConnectedUser>>("UpdateListConnectedUsers", HandleUpdateList);
         await _hubConnection.StartAsync();
         await base.OnInitializedAsync();
 
     }
+
+    private void HandleUpdateList(List<ConnectedUser> updateConectedUserslist)
+    {
+        _connectedUsers = updateConectedUserslist;
+        InvokeAsync(StateHasChanged);
+    }
+
     private async Task ProvideUserInfoToHubServer(string userName)
     {
-        await ConnectionToHubServer(userName);
+        var userId = Guid.NewGuid().ToString();
+        await ConnectionToHubServer(userName,userId);
     }
 
     private void HandleSystemMessage(string obj)

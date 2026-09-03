@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="BlazorApp/BlazorApp.Client/BlazorApp.Client.csproj" />
   <Project Path="BlazorApp/BlazorApp/BlazorApp.csproj" />
+  <Project Path="ChatContracts/ChatContracts.csproj" Id="e52f603a-5c63-48e4-bbef-d6d0394a7a91" />
   <Project Path="HubServer/HubServer.csproj" />
 </Solution>

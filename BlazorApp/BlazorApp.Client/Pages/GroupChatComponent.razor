@@ -1,0 +1,20 @@
+﻿<h3>=================GroupChatComponent=====================</h3>
+@if(_connectedUsers is null || _connectedUsers.Count <=0)
+{
+    <h3>GroupChat hiện không có thành viên nào</h3>
+}
+else
+{
+    <ul>
+        @foreach (var user in _connectedUsers)
+        {
+            <li>@user.UserName</li>
+        }
+    </ul>
+}
+
+
+@code {
+    [Parameter]
+    public List<ConnectedUser>? _connectedUsers { set; get; }
+}
