@@ -1,33 +1,64 @@
 ﻿
+
+
 @if(fromUserId is not null && 
 ToUser is not null && 
 connectedUsers is not null && 
 connectedUsers.Count > 0)
 {
-
-    <div class="card">
-        <ul class="list-group list-group-flush">
-            
-            
-                @foreach (var message in ToUser.Messages)
-                {
-                    <li class="list-group-item">
-
-                        <h5 class="card-title">QA Coder</h5>
-                        <p class="card-text"><i>@message.Message</i></p>
-                    </li>
-                }
-         
-        </ul>
-        <div class="card-footer d-flex align-items-start">
-            <input 
-                @onkeydown="(KeyboardEventArgs e)=>HandleKeyDown(e)" 
-                @bind="newMessage" type="text"
-                @bind:event="oninput"
-                placeholder="Write your Message here....." />
-            <button @onclick="Send" class="btn btn-primary" style="margin:5px">Send</button>
+    <div class="d-flex flex-column">
+        @* Header *@
+        
+        <div class="p-3 text-center border-bottom">
+            <strong style="font-size:20px">@ToUser.UserName</strong>
         </div>
+
+        @* Body *@
+        <div class="p-3 flex-grow-1 overflow-y-auto d-flex flex-column gap-2">
+            @foreach(var message in ToUser.Messages)
+            {
+                if(message.FromUserId == fromUserId)
+                {
+                    <div class="d-flex justify-content-end">
+                        <div class="p-2 text-center  text-white bg-primary rounded-4">
+                            @message.Message
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-start">
+                        <div class="p-2 text-center  text-black bg-light rounded-4">
+                            @message.Message
+                        </div>
+                    </div>
+                }
+            }
+            
+           
+        </div>
+
+        @* footer *@
+        <div class="d-flex gap-2 algin-items-center">
+            <input @onkeydown="(KeyboardEventArgs e) => HandleKeyDown(e)"
+                   @bind="newMessage" type="text"
+                   @bind:event="oninput"
+                   placeholder="Write your Message here....."
+                   class="form-control p-2 bg-light border-1"
+                   />
+            <button @onclick="Send" class="btn btn-primary">Send</button>
+        </div>
+
     </div>
+
+   
+}
+else
+{
+    <div class="container-fluid text-center vh-100 my-auto">
+        <h1>Pick One Start The Chat</h1>
+    </div>
+   
 }
 
 
