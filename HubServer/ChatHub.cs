@@ -59,9 +59,15 @@ public class ChatHub:Hub
         await base.OnDisconnectedAsync(exception);
         
     }
-        
-       
-       
+    
+    public async Task ForwarMessage(string connnectedId,string fromUserId, string message)
+    {
+        _logger.LogInformation("Connected Id " + connnectedId);
+        await Clients.Client(connnectedId).SendAsync("RecieveMessage",fromUserId, message); 
+    }
+
+
+
 
 }
 

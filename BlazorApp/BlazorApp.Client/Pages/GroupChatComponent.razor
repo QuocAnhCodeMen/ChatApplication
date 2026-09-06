@@ -1,25 +1,38 @@
-﻿<h3>=================GroupChatComponent=====================</h3>
+﻿
 @if(_connectedUsers is null || _connectedUsers.Count <=0)
 {
     <h3>GroupChat hiện không có thành viên nào</h3>
 }
 else
 {
-    <ul class="list-group">
+    //Header
+    <div class="p-3 border-bottom border-end text-center">
+        <strong style="font-size:30px">GroupChat</strong>
+    </div>
+
+    //ChatMembers
+    <div class="overflow-y-auto">
         @foreach (var user in _connectedUsers)
         {
             if (!string.IsNullOrEmpty(UserId))
             {
                 if (user.UserId != UserId)
                 {
-                    <li @onclick="()=>SelectUser(user)" class="list-group-item">@user.UserName</li>
+                    <div @onclick="() => SelectUser(user)" class="d-flex p-2 gap-3 justify-content-between algin-items-center border-bottom border-end chat-member @(selectedId == user.UserId ? "active " : "")">
+                        <div class="d-flex gap-1 algin-items-center">
+                            <div class="image-avt" style="width:30px;height:30px;background-color:blue;border-radius:30px"></div>
+                            <div><strong>@user.UserName</strong></div>
+                        </div>
+                       
+                        <div class="notification-alert @(user.Messages.Where(m => m.Unread == true).Count()>0?"d-block":"d-none")">@user.Messages.Where(m => m.Unread == true).Count()</div>
+                    </div>
                 }
             }
-
-            
+           
         }
        
-    </ul>
+
+    </div>
 
 }
 
@@ -32,8 +45,11 @@ else
     [Parameter]
     public EventCallback<ConnectedUser> eventCallback { set; get; }
 
+    private string selectedId = string.Empty;
+
     private void SelectUser(ConnectedUser user)
     {
+        selectedId = user.UserId ?? string.Empty;
         eventCallback.InvokeAsync(user);
     }
 }

@@ -1,11 +1,43 @@
 ﻿@page "/"
-
+@layout EmptyLayout
 @implements IAsyncDisposable
 
-<PageTitle>Home</PageTitle>
-
-
+<PageTitle>ChatApplication</PageTitle>
 @if (SystemMessageFromHubServer is null)
+{
+    <UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
+}
+else
+{
+    <div class="container-fluid p-0 d-flex vh-100">
+        <div class="chat-sidebar d-flex flex-column">
+            <GroupChatComponent _connectedUsers="_connectedUsers"
+                                UserId="@UserId"
+                                eventCallback="SelectUser" />
+        </div>
+        <div class="flex-grow-1 bg-black">
+            <ChatComponent fromUserId="@UserId"
+                           ToUser="@TargetUser"
+                           connectedUsers="_connectedUsers"
+                           hubConnection="_hubConnection" />
+        </div>
+
+    </div>
+}
+
+
+
+
+<style>
+    .chat-sidebar{
+        min-width:220px;
+        width:300px;
+       
+    }
+</style>
+
+
+@* @if (SystemMessageFromHubServer is null)
 {
     <UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
 }
@@ -22,12 +54,13 @@ else
         <div class="col-8">
             <ChatComponent fromUserId="@UserId"
                            ToUser="@TargetUser"
-                           connectedUsers="_connectedUsers"/>
+                           connectedUsers="_connectedUsers"
+                           hubConnection="_hubConnection"/>
         </div>
     </div>
     
     
-}
+} *@
 
 
 
@@ -35,7 +68,7 @@ else
 @code{
     private HubConnection? _hubConnection;
     private string? SystemMessageFromHubServer;
-    private List<ConnectedUser>? _connectedUsers;
+    private List<ConnectedUser> _connectedUsers = new();
     private string? UserId = string.Empty;
     private ConnectedUser? TargetUser{ set; get; }
     protected override async Task OnInitializedAsync()
@@ -50,14 +83,55 @@ else
                 .Build();
         _hubConnection.On<string,string>("SystemMessage", HandleSystemMessage);
         _hubConnection.On<List<ConnectedUser>>("UpdateListConnectedUsers", HandleUpdateList);
+        _hubConnection.On<string, string>("RecieveMessage", HandleRecieveMessage);
         await _hubConnection.StartAsync();
         await base.OnInitializedAsync();
 
     }
 
-    private void HandleUpdateList(List<ConnectedUser> updateConectedUserslist)
+    private void HandleRecieveMessage(string fromUserId, string message)
     {
-        _connectedUsers = updateConectedUserslist;
+        Console.WriteLine("UserID " + fromUserId);
+        var user = _connectedUsers?.FirstOrDefault(u => u.UserId == fromUserId);
+        Console.WriteLine("Name:" + user?.UserName);
+        if(user is not null)
+        {
+            var chatMessage = new ChatMessage()
+                {
+                    Message = message,
+                    FromUserId = fromUserId,
+                    ToUserId = UserId
+                };
+            user.Messages.Add(chatMessage);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleUpdateList(List<ConnectedUser> updateUserslist)
+    {
+        if (_connectedUsers.Count == 0)
+        {
+            _connectedUsers = updateUserslist;
+        }
+        else
+        {
+            var existingUsersDictionary = _connectedUsers
+                    .ToDictionary(u => u.ConnectedId??string.Empty);
+            foreach (var user in updateUserslist)
+            {
+                
+                   if (!existingUsersDictionary.ContainsKey(user.ConnectedId ?? string.Empty))
+                    {
+                        _connectedUsers.Add(user);
+                    }
+                
+
+            }
+            _connectedUsers = _connectedUsers
+                            .Where(u => updateUserslist.Any(newUser => newUser.ConnectedId == u.ConnectedId))
+                            .ToList();
+        }
+     
         InvokeAsync(StateHasChanged);
     }
 

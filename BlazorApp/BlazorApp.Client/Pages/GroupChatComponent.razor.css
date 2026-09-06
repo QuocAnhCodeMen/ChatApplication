@@ -1,0 +1,16 @@
+/* CSS for GroupChatComponent component */
+.notification-alert {
+    width: 24px;
+    height: 24px;
+    background: red;
+    text-align:center;
+    color:white;
+    border-radius:24px;
+}
+.chat-member {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.chat-member:hover, .chat-member.active {
+        background-color: rgba(231, 185, 209, 0.8);
+}
