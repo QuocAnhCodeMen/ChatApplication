@@ -1,16 +1,15 @@
 ﻿
-
-<EditForm Model="userInfo" OnValidSubmit="Submit">
-    <DataAnnotationsValidator />
-    <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label" style="font-weight:bold">UserName</label>
-        <input type="text" class="form-control" @bind-value="userInfo.UserName">
-        <ValidationMessage For="(()=>userInfo.UserName)" />
-        
-    </div>
-    <button type="submit" class="btn btn-primary">Join Group Chat</button>
-
-</EditForm>
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <EditForm Model="userInfo" OnValidSubmit="Submit" class="p-4 border rounded shadow-sm">
+        <DataAnnotationsValidator />
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label fw-bold">UserName</label>
+            <input type="text" class="form-control" @bind-value="userInfo.UserName">
+            <ValidationMessage For="(() => userInfo.UserName)" />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Join Group Chat</button>
+    </EditForm>
+</div>
 
 
 

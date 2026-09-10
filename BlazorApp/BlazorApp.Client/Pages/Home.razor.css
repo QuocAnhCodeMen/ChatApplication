@@ -1,0 +1,5 @@
+/* CSS for Home component */
+.chat-sidebar {
+    min-width: 220px;
+    width: 300px;
+}

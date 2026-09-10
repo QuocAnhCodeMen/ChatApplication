@@ -1,5 +1,6 @@
 ﻿@page "/"
 @layout EmptyLayout
+@inject IJSRuntime JsRuntime
 @implements IAsyncDisposable
 
 <PageTitle>ChatApplication</PageTitle>
@@ -27,54 +28,13 @@ else
 
 
 
-
-<style>
-    .chat-sidebar{
-        min-width:220px;
-        width:300px;
-       
-    }
-</style>
-
-
-@* @if (SystemMessageFromHubServer is null)
-{
-    <UserInfoComponent eventCallback="ProvideUserInfoToHubServer" />
-}
-else
-{
-    <h1>@SystemMessageFromHubServer</h1>
-    
-    <div class="row">
-        <div class="col-4">
-            <GroupChatComponent _connectedUsers="_connectedUsers"
-                              UserId="@UserId"
-                              eventCallback="SelectUser"/>
-        </div>
-        <div class="col-8">
-            <ChatComponent fromUserId="@UserId"
-                           ToUser="@TargetUser"
-                           connectedUsers="_connectedUsers"
-                           hubConnection="_hubConnection"/>
-        </div>
-    </div>
-    
-    
-} *@
-
-
-
-
 @code{
     private HubConnection? _hubConnection;
     private string? SystemMessageFromHubServer;
     private List<ConnectedUser> _connectedUsers = new();
     private string? UserId = string.Empty;
     private ConnectedUser? TargetUser{ set; get; }
-    protected override async Task OnInitializedAsync()
-    {
-        // await ConnectionToHubServer();
-    }
+
 
     private async Task ConnectionToHubServer(string userName, string userId)
     {
@@ -103,6 +63,7 @@ else
                     ToUserId = UserId
                 };
             user.Messages.Add(chatMessage);
+            JsRuntime.InvokeVoidAsync("playNotificationSound", "/sounds/notification.wav");
             InvokeAsync(StateHasChanged);
         }
     }

@@ -1,41 +1,51 @@
 ﻿
-@if(_connectedUsers is null || _connectedUsers.Count <=1)
-{
-    <h3>GroupChat hiện không có thành viên nào</h3>
-}
-else
-{
-    //Header
+
+
+
+    @* Header *@
+    
+
+    @* ChatMembers *@
+    @if(_connectedUsers?.Count == 1)
+    {
+        <div class="p-3 border-bottom border-end text-center">
+            <strong style="font-size:30px">Hello @_connectedUsers[0].UserName</strong>
+        </div>
+        <div class="vh-100 border-end">
+                <p>No one in the chat but you right now!</p>
+        </div>
+    }
+    else
+    {
     <div class="p-3 border-bottom border-end text-center">
         <strong style="font-size:30px">FakeMess</strong>
     </div>
-
-    //ChatMembers
-    <div class="overflow-y-auto">
-        @foreach (var user in _connectedUsers)
-        {
-            if (!string.IsNullOrEmpty(UserId))
+        <div class="overflow-y-auto border-end vh-100">
+            @foreach (var user in _connectedUsers ?? Enumerable.Empty<ConnectedUser>())
             {
-                if (user.UserId != UserId)
+                if (!string.IsNullOrEmpty(UserId))
                 {
-                    <div @onclick="() => SelectUser(user)" class="d-flex p-2 gap-3 justify-content-between algin-items-center border-bottom border-end chat-member @(selectedId == user.UserId ? "active " : "")">
-                        <div class="d-flex gap-1 algin-items-center">
-                            @* <div class="image-avt" style="width:30px;height:30px;background-color:blue;border-radius:30px"></div> *@
-                            <img src="/images/avartar.jpg" width="30px" height="30px" class="rounded-circle" alt="avartar" />
-                            <div><strong>@user.UserName</strong></div>
+                    if (user.UserId != UserId)
+                    {
+                        <div @onclick="() => SelectUser(user)" class="d-flex p-2 gap-3 justify-content-between algin-items-center border-bottom border-end chat-member @(selectedId == user.UserId ? "active " : "")">
+                            <div class="d-flex gap-1 algin-items-center">
+                                @* <div class="image-avt" style="width:30px;height:30px;background-color:blue;border-radius:30px"></div> *@
+                                <img src="/images/avartar.jpg" width=@(30) height=@(30) class="rounded-circle" alt="avartar" />
+                                <div><strong>@user.UserName</strong></div>
+                            </div>
+
+                            <div class="notification-alert @(user.Messages.Where(m => m.Unread == true).Count() > 0 ? "d-block" : "d-none")">@user.Messages.Where(m => m.Unread == true).Count()</div>
                         </div>
-                       
-                        <div class="notification-alert @(user.Messages.Where(m => m.Unread == true).Count()>0?"d-block":"d-none")">@user.Messages.Where(m => m.Unread == true).Count()</div>
-                    </div>
+                    }
                 }
+
             }
-           
-        }
+
        
+        </div>
+    }
 
-    </div>
 
-}
 
 
 @code {

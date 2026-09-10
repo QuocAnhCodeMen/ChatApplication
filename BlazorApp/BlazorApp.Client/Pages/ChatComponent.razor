@@ -1,21 +1,15 @@
 ﻿
 
-
-@if(fromUserId is not null && 
-ToUser is not null && 
-connectedUsers is not null && 
-connectedUsers.Count > 0)
-{
-    <div class="d-flex flex-column">
+ <div class="d-flex flex-column vh-100">
         @* Header *@
         
         <div class="p-3 text-center border-bottom">
-            <strong style="font-size:20px">@ToUser.UserName</strong>
+            <strong style="font-size:20px">@(ToUser is null?"Click One In The SideBar To Start The Chat":ToUser.UserName)</strong>
         </div>
 
         @* Body *@
         <div class="p-3 flex-grow-1 overflow-y-auto d-flex flex-column gap-2">
-            @foreach(var message in ToUser.Messages)
+            @foreach(var message in ToUser?.Messages ?? Enumerable.Empty<ChatMessage>())
             {
                 if(message.FromUserId == fromUserId)
                 {
@@ -45,25 +39,13 @@ connectedUsers.Count > 0)
                    @bind:event="oninput"
                    placeholder="Write your Message here....."
                    class="form-control p-2 bg-light border-1"
-                   />
-            <button @onclick="Send" class="btn btn-primary">Send</button>
+                   disabled=@(ToUser is not null?false:true) />
+            <button disabled=@(ToUser is not null?false:true) 
+                    @onclick="Send" 
+                    class="btn btn-primary">Send</button>
         </div>
 
-    </div>
-
-   
-}
-else
-{
-    <div class="container-fluid text-center vh-100 my-auto">
-        <h1>Pick One Start The Chat</h1>
-    </div>
-   
-}
-
-
-
-
+ </div>
 
 @code {
 
